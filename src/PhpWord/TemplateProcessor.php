@@ -799,14 +799,15 @@ class TemplateProcessor
     {
         $xmlBlock = null;
         $matches = array();
-        preg_match(
-            '/\$\{' . $blockname . '}(.*)\$\{\/' . $blockname . '}/is',
+        preg_match_all(
+            '/\$\{' . $blockname . '\}(.*?)\$\{\/' . $blockname . '\}/is',
             $this->tempDocumentMainPart,
-            $matches
+            $matches,
+            PREG_SET_ORDER
         );
 
-        if (isset($matches[1])) {
-            $xmlBlock = $matches[1];
+        foreach ($matches as $match) {
+            $xmlBlock = $match[1];
             if ($indexVariables) {
                 $cloned = $this->indexClonedVariables($clones, $xmlBlock);
             } elseif ($variableReplacements !== null && is_array($variableReplacements)) {
@@ -820,7 +821,7 @@ class TemplateProcessor
 
             if ($replace) {
                 $this->tempDocumentMainPart = str_replace(
-                    $matches[0],
+                    $match[0],
                     implode('', $cloned),
                     $this->tempDocumentMainPart
                 );
